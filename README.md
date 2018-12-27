@@ -47,8 +47,8 @@ This repo will help you install the [secret-gen plugin](https://github.com/sethv
 - runs unseal command (requires `vault_unseal_key`) if you do not have auto unseal setup.
 - default: false
 
-### `pause_timer`:token
-token
+### `pause_timer`:
+
 - the vault restart plays run in `serial: 1` and anticipate tokenthat you may need to wait between vault restarts, for perhaps a loadbalancer or health check. this is measured in seconds.
 - default: 2
 
