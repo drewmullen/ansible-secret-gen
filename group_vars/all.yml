@@ -1,0 +1,13 @@
+plugin_pkg_url: https://github.com/sethvargo/vault-secrets-gen/releases/download/v0.0.2/vault-secrets-gen_0.0.2_linux_amd64.tgz
+vault_config_path: /etc/vault.d
+vault_user: vault
+vault_group: bin
+vault_plugin_config_path: /var/appl/vault/plugin
+tls_enabled: false
+validate_certs: no
+vault_addr: "http{%if tls_enabled %}s{%else%}{%endif%}://{{ inventory_hostname }}:8200"
+vault_token: "{{ lookup('env', 'VAULT_TOKEN') }}"
+vault_install_dir: /usr/local/bin
+restart: true
+auto_unseal: false
+pause_timer: 2

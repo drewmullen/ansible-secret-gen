@@ -1,0 +1,25 @@
+---
+# tasks file for vault_step_down
+
+- name: curl
+  uri:
+    url: "{{ vault_addr.split(':')[0] }}://{{ ansible_default_ipv4.address }}:8200/v1/sys/step-down"
+    method: PUT
+    validate_certs: "{{ validate_certs | lower}}"
+    headers:
+      X-Vault-Token: "{{ vault_token }}"
+    status_code: 204, 200, 400 # 400 = DR cluster
+    delegate_to: localhost
+
+- name: pause "{{ pause_timer }}" seconds for f5
+  pause:
+    seconds: "{{ pause_timer }}"
+
+- name: restart service
+  service:
+    state: restarted
+    name: vault
+
+- name: unseal vault
+  import_tasks: unseal.yml
+  when: not auto_unseal

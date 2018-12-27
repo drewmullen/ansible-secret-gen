@@ -1,0 +1,35 @@
+---
+# tasks file for vault_plugin_secret_gen
+
+# ensure plugin_directory defined in vault config
+- name: create vault plugins folder
+  file:
+    path: '{{ vault_plugin_config_path }}'
+    state: directory
+    owner: "{{ vault_user }}"
+    group: "{{ vault_group }}"
+    mode: 0755
+
+- name: include plugin dir in vault config
+  lineinfile:
+    path: '{{ vault_config_path }}/vault_main.hcl'
+    line: 'plugin_directory = "{{ vault_plugin_config_path }}"'
+    state: present
+    insertafter: 'ui.*'
+
+- name: install package
+  unarchive:
+    src: "{{ plugin_pkg_url | basename }}"
+    dest: "{{ vault_plugin_config_path }}"
+    owner: "{{ vault_user }}"
+    group: "{{ vault_group }}"
+
+- name: Check Vault mlock capability
+  command: "setcap -v cap_ipc_lock=+ep {{ vault_plugin_config_path }}/vault-secrets-gen"
+  changed_when: false  # read-only task
+  ignore_errors: true
+  register: vault_mlock_capability
+
+- name: Enable non root mlock capability
+  command: "setcap cap_ipc_lock=+ep {{ vault_plugin_config_path }}/vault-secrets-gen"
+  when: vault_mlock_capability is failed

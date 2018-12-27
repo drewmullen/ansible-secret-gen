@@ -1,0 +1,10 @@
+---
+
+- name: curl
+  uri:
+    url: "{{ vault_addr.split(':')[0] }}://{{ ansible_default_ipv4.address }}:8200/v1/sys/unseal"
+    method: PUT
+    validate_certs: "{{ validate_certs | lower}}"
+    body: '{"key":"{{ vault_unseal_key }}"}'
+    status_code: 200
+    delegate_to: localhost
